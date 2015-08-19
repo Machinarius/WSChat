@@ -15,5 +15,14 @@
   "bugs": {
     "url": "https://github.com/machinarius/WSChat/issues"
   },
-  "homepage": "https://github.com/machinarius/WSChat#readme"
+  "homepage": "https://github.com/machinarius/WSChat#readme",
+  "devDependencies": {
+    "chai": "^3.2.0",
+    "gulp": "^3.9.0",
+    "mocha": "^2.2.5"
+  },
+  "dependencies": {
+    "mongodb": "^2.0.42",
+    "q": "^1.4.1"
+  }
 }
