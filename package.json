@@ -1,0 +1,19 @@
+{
+  "name": "wschat",
+  "version": "0.0.1",
+  "description": "A WebSockets chat example written on top of the MEAN stack with Typescript",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/machinarius/WSChat.git"
+  },
+  "author": "Germán Valencia",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/machinarius/WSChat/issues"
+  },
+  "homepage": "https://github.com/machinarius/WSChat#readme"
+}
