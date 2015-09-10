@@ -2,11 +2,14 @@
 
 //require('typescript-require');
 
+require('source-map-support').install();
+
 var gulp = require('gulp');
 var del = require('del');
 
 var typescript = require('gulp-typescript');
 var mocha = require('gulp-mocha');
+var sourcemaps = require('gulp-sourcemaps');
 
 gulp.task('clean', function(done) {
 	del([
@@ -15,15 +18,21 @@ gulp.task('clean', function(done) {
 });
 
 gulp.task('build_server', ['clean'], function() {
+	gulp.src('Server/**/*.json')
+		.pipe(gulp.dest('Out/Server'));
+	
 	var tsResult = 
-		gulp.src("Server/**/*.ts")
+		gulp.src(["**/*.ts", "!node_modules/**"])
+		.pipe(sourcemaps.init())
 		.pipe(typescript({ 
 			module: 'commonjs', 
 			target: 'ES5',
 			removeComments: true
 		}));
 	
-	return tsResult.js.pipe(gulp.dest('Out/Server'));
+	return tsResult.js
+		.pipe(sourcemaps.write())
+		.pipe(gulp.dest('Out'));
 });
 
 gulp.task('test_server', ['build_server'], function() {
@@ -31,4 +40,4 @@ gulp.task('test_server', ['build_server'], function() {
 		.pipe(mocha());
 });
 
-gulp.task('default', ['build_server']);
+gulp.task('default', ['test_server']);

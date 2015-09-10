@@ -1,23 +1,23 @@
 export class Message {
-	private _contents: string;
-	private _authorName: string;
-	private _timestamp: number;
+	private _contents: String;
+	private _authorName: String;
+	private _timestamp: Number;
 	
-	constructor(contents: string, authorName: string, timestamp: number) {
+	constructor(contents: String, authorName: String, timestamp: Number) {
 		this._contents = contents;
 		this._authorName = authorName;
 		this._timestamp = timestamp;
 	}
 	
-	public get contents(): string {
+	public get contents(): String {
 		return this._contents;
 	}
 	
-	public get authorName(): string {
+	public get authorName(): String {
 		return this._authorName;
 	}
 	
-	public get timestamp(): number {
+	public get timestamp(): Number {
 		return this._timestamp;
 	}
 }
