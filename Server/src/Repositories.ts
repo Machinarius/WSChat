@@ -14,25 +14,16 @@ export interface IMessagesRepository {
 export class MessagesRepository implements IMessagesRepository {
 	private db: Mongoose.Connection;
 	
-	public constructor (private connectionString?: string) {
-		this.connectionString = connectionString || 'mongodb://localhost:27017/wschat';
-	}
-	
-	private initializationPromise: Q.Promise<{}>;
-	
-	public initialize (): Q.Promise<{}> {
-		if (this.initializationPromise) {
-			return this.initializationPromise;
+	public constructor (connection: Mongoose.Connection) {
+		if (connection == null) {
+			throw new Error("The 'connection' argument must not be null");
 		}
 		
-		var initDeferred = q.defer();
+		if (connection.readyState !== 1) {
+			throw new Error("The 'connection' argument must be ready/connected - actual state: " + connection.readyState);
+		}
 		
-		this.db = Mongoose.connect(this.connectionString).connection;
-		this.db.on('error', initDeferred.reject);
-		this.db.once('open', initDeferred.resolve);
-		
-		this.initializationPromise = initDeferred.promise;
-		return this.initializationPromise;
+		this.db = connection;
 	}
 	
 	public getMessagesSince(sourceTimestamp: number): Q.Promise<Data.Message[]> {

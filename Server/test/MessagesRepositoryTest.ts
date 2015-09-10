@@ -13,9 +13,10 @@ import * as Repositories from '../src/Repositories';
 import * as Data from '../../Common/src/Data'
 
 var assert = chai.assert;
+
 var mongoDb: Mongo.Db;
+var mongooseCon: Mongoose.Connection;
 var dataRepository: Repositories.MessagesRepository;
-var repoInitPromise: Q.Promise<{}>;
 
 var dbAddress = 'mongodb://localhost:27017/wschat_test';
 var messagesSeed = require('./MessagesSeed.json');
@@ -27,7 +28,7 @@ before((done: MochaDone) => {
 				mongoDb = db;
 			}
 			
-			done(err);
+			mongooseCon = Mongoose.connect(dbAddress, null, done).connection;
 		});
 });
 
@@ -36,21 +37,10 @@ beforeEach((done: MochaDone) => {
 		done(err);
 	});
 	
-	dataRepository = new Repositories.MessagesRepository(dbAddress);
-	repoInitPromise = dataRepository.initialize();
-	
-	repoInitPromise
-		.then(done)
-		.catch(done);
+	dataRepository = new Repositories.MessagesRepository(mongooseCon);
 });
 
 describe('The Messages Repository', () => {
-	it("should always return the same promise for an #initialize call", (done: MochaDone) => {
-		var initializationPromise = dataRepository.initialize();
-		assert.isTrue(repoInitPromise == initializationPromise, 'The #initialize call returned a different promise the second time');
-		done();
-	});
-	
 	it("should return all the messages up from the specified point in time", (done: MochaDone) => {
 		var expectedMessages: Data.Message[] = [
 			new Data.Message ("I really like this", "MunchyKong31", 1438359484),
@@ -68,7 +58,11 @@ describe('The Messages Repository', () => {
 });
 
 afterEach((done: MochaDone) => {
-	databaseCleaner.clean(mongoDb, () => {
-		Mongoose.disconnect(done);
+	databaseCleaner.clean(mongoDb, done);
+});
+
+after((done: MochaDone) => {
+	mongoDb.close(true, () => {
+		Mongoose.disconnect(done);	
 	});
 });
