@@ -9,6 +9,7 @@ import * as DBModels from './Models';
 
 export interface IMessagesRepository {
 	getMessagesSince(sourceTimestamp: number): Q.Promise<Data.Message[]>;
+	insertMessage(newMessage: Data.Message): Q.Promise<Data.Message>;
 }
 
 export class MessagesRepository implements IMessagesRepository {
@@ -27,27 +28,39 @@ export class MessagesRepository implements IMessagesRepository {
 	}
 	
 	public getMessagesSince(sourceTimestamp: number): Q.Promise<Data.Message[]> {
-		var messagesDeferred = q.defer<Data.Message[]>();
+		var messagesQuery = 
+			DBModels.MessagesModel
+				.find({})
+				.where('timestamp')
+				.gte(sourceTimestamp)
+				.sort('+timestamp');
 		
-		var messagesCallback = (err: any, res: DBModels.IMessageDocument[]) => {
-			if (err) {
-				messagesDeferred.reject(err);
-				return;
-			}
-			
-			var messages = res.map((value: DBModels.IMessageDocument) => {
-				return new Data.Message(value.contents, value.author, value.timestamp);
+		var messageQueryExecutor = 
+			q.nbind<DBModels.IMessageDocument[]>(messagesQuery.exec, messagesQuery);
+		
+		return messageQueryExecutor()
+			.then((result: DBModels.IMessageDocument[]) => {
+				var messages = result.map((value: DBModels.IMessageDocument) => {
+					return new Data.Message(value.contents, value.author, value.timestamp);
+				});
+				
+				return messages;
 			});
-			messagesDeferred.resolve(messages);
-		};
+	}
+	
+	public insertMessage(newMessage: Data.Message): Q.Promise<Data.Message> {
+		var dbMessage = new DBModels.MessagesModel({
+			author: newMessage.authorName,
+			contents: newMessage.contents,
+			timestamp: newMessage.timestamp
+		});
 		
-		DBModels.MessagesModel
-			.find({})
-			.where('timestamp')
-			.gte(sourceTimestamp)
-			.sort('+timestamp')
-			.exec(messagesCallback);
+		var dbMessageSave =
+			q.nbind<DBModels.IMessageDocument> (dbMessage.save, dbMessage);
 		
-		return messagesDeferred.promise;
+		return dbMessageSave()
+			.then((messageDocument: DBModels.IMessageDocument) => {
+				return new Data.Message(messageDocument.contents, messageDocument.author, messageDocument.timestamp);
+			});
 	}
 }

@@ -55,6 +55,28 @@ describe('The Messages Repository', () => {
 			})
 			.catch(done);
 	});
+	
+	it("should properly insert any message into the database", (done: MochaDone) => {
+		var testMessage = new Data.Message("This is a test message", "Machinarius", new Date().getTime());
+		
+		var expectedMessages: Data.Message[] = [
+			new Data.Message ("I really like this", "MunchyKong31", 1438359484),
+			new Data.Message ("This needs more dank memes", "IrateSloth45", 1440306000),
+			testMessage
+		];
+		
+		dataRepository.insertMessage(testMessage)
+			.then((newMessage: Data.Message) => {
+				dataRepository.getMessagesSince(1438359484)
+					.then((actualMessages: Data.Message[]) => {
+						assert.deepEqual(actualMessages, expectedMessages, 
+							"The returned messages did not match the expectation");
+						done();
+					})
+					.catch(done);
+			})
+			.catch(done);
+	});
 });
 
 afterEach((done: MochaDone) => {
