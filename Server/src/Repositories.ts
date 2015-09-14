@@ -9,7 +9,7 @@ import * as DBModels from './Models';
 
 export interface IMessagesRepository {
 	getMessagesSince(sourceTimestamp: number): Q.Promise<Data.Message[]>;
-	insertMessage(newMessage: Data.Message): Q.Promise<Data.Message>;
+	insertMessage(newMessage: Data.Message): Q.Promise<{}>;
 }
 
 export class MessagesRepository implements IMessagesRepository {
@@ -48,7 +48,7 @@ export class MessagesRepository implements IMessagesRepository {
 			});
 	}
 	
-	public insertMessage(newMessage: Data.Message): Q.Promise<Data.Message> {
+	public insertMessage(newMessage: Data.Message): Q.Promise<{}> {
 		var dbMessage = new DBModels.MessagesModel({
 			author: newMessage.authorName,
 			contents: newMessage.contents,
@@ -58,9 +58,6 @@ export class MessagesRepository implements IMessagesRepository {
 		var dbMessageSave =
 			q.nbind<DBModels.IMessageDocument> (dbMessage.save, dbMessage);
 		
-		return dbMessageSave()
-			.then((messageDocument: DBModels.IMessageDocument) => {
-				return new Data.Message(messageDocument.contents, messageDocument.author, messageDocument.timestamp);
-			});
+		return dbMessageSave();
 	}
 }
