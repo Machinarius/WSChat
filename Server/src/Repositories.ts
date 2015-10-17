@@ -61,3 +61,7 @@ export class MessagesRepository implements IMessagesRepository {
 		return dbMessageSave();
 	}
 }
+
+export interface INicknameGenerator {
+	getNewRandomNickname(): string;
+}

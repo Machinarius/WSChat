@@ -1,4 +1,3 @@
-/// <reference path="../../typings/q/Q.d.ts" />
 /// <reference path="../../typings/mongoose/mongoose.d.ts" />
 
 import * as Mongoose from "mongoose";

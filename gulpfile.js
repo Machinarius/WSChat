@@ -1,6 +1,5 @@
+/// <reference path="typings/node/node.d.ts" />
 /// <reference path="typings/gulp/gulp.d.ts" />
-
-//require('typescript-require');
 
 require('source-map-support').install();
 
@@ -23,21 +22,26 @@ gulp.task('build_server', ['clean'], function() {
 	
 	var tsResult = 
 		gulp.src(["**/*.ts", "!node_modules/**"])
-		.pipe(sourcemaps.init())
-		.pipe(typescript({ 
-			module: 'commonjs', 
-			target: 'ES5',
-			removeComments: true
-		}));
+			.pipe(sourcemaps.init())
+			.pipe(typescript({ 
+				module: 'commonjs', 
+				target: 'ES5',
+				removeComments: true
+			}));
 	
 	return tsResult.js
-		.pipe(sourcemaps.write())
+		.pipe(sourcemaps.write({
+			includeContent: false,
+			sourceRoot: '.'
+		}))
 		.pipe(gulp.dest('Out'));
 });
 
 gulp.task('test_server', ['build_server'], function() {
 	gulp.src('Out/Server/test/**/*.js', { read: false })
-		.pipe(mocha());
+		.pipe(mocha({
+			reporter: "nyan"
+		}));
 });
 
 gulp.task('default', ['test_server']);
